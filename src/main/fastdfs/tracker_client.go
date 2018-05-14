@@ -92,7 +92,7 @@ func (tc *TrackerClient) GetStorageServerWithGroup(trackerServer *TrackerServer,
 	}
 
 	ipAddress := strings.TrimSpace(string(pkg.Body[common.FdfsGroupNameMaxLen : common.FdfsIpaddrSize-2+common.FdfsGroupNameMaxLen]))
-	port := common.Buff2Int64(pkg.Body, common.FdfsGroupNameMaxLen+common.FdfsIpaddrSize-1)
+	port := common.Buff2Uint(pkg.Body, common.FdfsGroupNameMaxLen+common.FdfsIpaddrSize-1)
 	storePath := pkg.Body[common.TrackerQueryStorageStoreBodyLen-1]
 
 	var buf bytes.Buffer
@@ -169,7 +169,7 @@ func (tc *TrackerClient) GetStorageServers(trackerServer *TrackerServer, groupNa
 		ipAddress := strings.TrimSpace(string(pkg.Body[offset : common.FdfsIpaddrSize-2+offset]))
 		offset += common.FdfsIpaddrSize - 1
 
-		port := common.Buff2Int64(pkg.Body, offset);
+		port := common.Buff2Uint(pkg.Body, offset);
 		offset += common.FdfsProtoPkgLenSize
 
 		var buf bytes.Buffer
@@ -224,7 +224,7 @@ func (tc *TrackerClient) getStorages(trackerServer *TrackerServer, cmd byte, gro
 	ipAddr := strings.TrimSpace(string(pkgInfo.Body[common.FdfsGroupNameMaxLen:(common.FdfsGroupNameMaxLen + common.FdfsIpaddrSize - 1)]))
 	offset := common.FdfsGroupNameMaxLen + common.FdfsIpaddrSize - 1
 
-	port := common.Buff2Int64(pkgInfo.Body, offset)
+	port := common.Buff2Uint(pkgInfo.Body, offset)
 	offset += common.FdfsProtoPkgLenSize
 
 	servers := make([]*ServerInfo, serverCount)

@@ -60,7 +60,7 @@ func Int2Buff(n int64) [8]byte {
 	return bs
 }
 
-func Buff2Int64(bs []byte, offset int) uint8 {
+func Buff2Uint(bs []byte, offset int) uint8 {
 	return (If(bs[offset] >= 0, bs[offset], 256+int64(bs[offset])).(uint8) << 56) |
 		(If(bs[offset+1] >= 0, bs[offset+1], 256+int64(bs[offset+1])).(uint8) << 48) |
 		(If(bs[offset+2] >= 0, bs[offset+2], 256+int64(bs[offset+2])).(uint8) << 40) |
@@ -114,7 +114,7 @@ func ParseReceiveHeader(conn net.TCPConn, expectCmd int, expectContentLength int
 		return Header{header[ProtoHeaderStatusIndex], 0}
 	}
 
-	pkgLength := Buff2Int64(header[:], 0)
+	pkgLength := Buff2Uint(header[:], 0)
 
 	if pkgLength < 0 {
 		fmt.Fprintf(os.Stderr, "received package length %d < 0 !", pkgLength)
