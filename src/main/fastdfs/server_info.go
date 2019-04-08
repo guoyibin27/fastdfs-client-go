@@ -1,7 +1,6 @@
 package fastdfs
 
 import (
-	"github.com/fastdfs-client-go/src/main/common"
 	"net"
 )
 
@@ -14,5 +13,5 @@ func NewServerInfo(ipAddr string) *ServerInfo {
 }
 
 func (si *ServerInfo) Connect() (conn *net.TCPConn, e error) {
-	return common.GetConnection(si.ipAddr)
+	return GetConnection(si.ipAddr)
 }

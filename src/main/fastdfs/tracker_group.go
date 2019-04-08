@@ -1,10 +1,9 @@
 package fastdfs
 
 import (
-	"sync"
 	"fmt"
 	"os"
-	"github.com/fastdfs-client-go/src/main/common"
+	"sync"
 )
 
 type TrackerGroup struct {
@@ -31,7 +30,7 @@ func NewTrackerGroup(trackServers []string) *TrackerGroup {
    * @return connected tracker server, null for fail
    */
 func (tr *TrackerGroup) getConnectedTrackerServerWithIndex(index int) (ts *TrackerServer, err error) {
-	if conn, e := common.GetConnection(tr.trackerServers[index]); e != nil {
+	if conn, e := GetConnection(tr.trackerServers[index]); e != nil {
 		return nil, e
 	} else {
 		return NewTrackerServer(conn), nil

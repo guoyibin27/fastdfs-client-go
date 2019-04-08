@@ -2,7 +2,6 @@ package fastdfs
 
 import (
 	"net"
-	"github.com/fastdfs-client-go/src/main/common"
 )
 
 type TrackerServer struct {
@@ -17,7 +16,7 @@ func NewTrackerServer(conn *net.TCPConn) *TrackerServer {
 
 func (tr *TrackerServer) Close() {
 	if tr.conn != nil {
-		common.CloseConnection(tr.conn)
+		CloseConnection(tr.conn)
 	}
 }
 

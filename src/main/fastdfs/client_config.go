@@ -1,7 +1,6 @@
 package fastdfs
 
 import (
-	"github.com/fastdfs-client-go/src/main/common"
 	"fmt"
 	"strings"
 )
@@ -19,18 +18,18 @@ type ClientConfig struct {
 var cc ClientConfig
 
 func InitClientConfig(filePath string) {
-	reader := common.NewConfigReader()
+	reader := NewConfigReader()
 	reader.LoadConfigFile(filePath)
-	cc.connectTimeout = reader.GetIntValue(common.ConfKeyConnectTimeout, common.DefaultConnectTimeout) * 1000
-	cc.networkTimeout = reader.GetIntValue(common.ConfKeyNetworkTimeout, common.DefaultNetworkTimeout) * 1000
-	cc.charset = reader.GetStringValue(common.ConfKeyCharset, common.DefaultCharset)
-	cc.antiStealToken = reader.GetBoolValue(common.ConfKeyHttpAntiStealToken, false)
-	cc.trackerHttpPort = reader.GetIntValue(common.ConfKeyHttpTrackerHttpPort, common.DefaultHttpTrackerHttpPort)
+	cc.connectTimeout = reader.GetIntValue(ConfKeyConnectTimeout, DefaultConnectTimeout) * 1000
+	cc.networkTimeout = reader.GetIntValue(ConfKeyNetworkTimeout, DefaultNetworkTimeout) * 1000
+	cc.charset = reader.GetStringValue(ConfKeyCharset, DefaultCharset)
+	cc.antiStealToken = reader.GetBoolValue(ConfKeyHttpAntiStealToken, false)
+	cc.trackerHttpPort = reader.GetIntValue(ConfKeyHttpTrackerHttpPort, DefaultHttpTrackerHttpPort)
 	if cc.antiStealToken {
-		cc.secretKey = reader.GetStringValue(common.ConfKeyHttpSecretKey, "")
+		cc.secretKey = reader.GetStringValue(ConfKeyHttpSecretKey, "")
 	}
 
-	trackerServers := reader.GetValues(common.ConfKeyTrackerServer)
+	trackerServers := reader.GetValues(ConfKeyTrackerServer)
 	cc.trackGroup = NewTrackerGroup(trackerServers)
 }
 

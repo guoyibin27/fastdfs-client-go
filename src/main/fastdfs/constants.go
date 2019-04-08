@@ -1,4 +1,4 @@
-package common
+package fastdfs
 
 const (
 	FdfsProtoCmdQuit                                byte = 82

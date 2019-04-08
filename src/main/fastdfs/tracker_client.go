@@ -1,12 +1,11 @@
 package fastdfs
 
 import (
-	"strings"
-	"github.com/fastdfs-client-go/src/main/common"
 	"bytes"
-	"strconv"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type TrackerClient struct {
@@ -68,32 +67,32 @@ func (tc *TrackerClient) GetStorageServerWithGroup(trackerServer *TrackerServer,
 	var length int
 
 	if strings.Compare(strings.TrimSpace(groupName), "") == 0 || len(strings.TrimSpace(groupName)) == 0 {
-		cmd = common.TrackerProtoCmdServiceQueryStoreWithoutGroupOne
+		cmd = TrackerProtoCmdServiceQueryStoreWithoutGroupOne
 		length = 0
 	} else {
-		cmd = common.TrackerProtoCmdServiceQueryStoreWithGroupOne
-		length = common.FdfsGroupNameMaxLen
+		cmd = TrackerProtoCmdServiceQueryStoreWithGroupOne
+		length = FdfsGroupNameMaxLen
 	}
 
-	header := common.PackHeader(cmd, int64(length), 0)
+	header := PackHeader(cmd, int64(length), 0)
 	conn.Write(header)
 
 	//has group name
 	if strings.Compare(strings.TrimSpace(groupName), "") != 0 && len(strings.TrimSpace(groupName)) > 0 {
 		bs := []byte(groupName)
-		groupNameByte := make([]byte, common.FdfsGroupNameMaxLen)
+		groupNameByte := make([]byte, FdfsGroupNameMaxLen)
 		copy(groupNameByte, bs)
 		conn.Write(groupNameByte)
 	}
 
-	pkg := common.ParseReceivePackage(*conn, int(common.TrackerProtoCmdResp), int64(common.TrackerQueryStorageStoreBodyLen))
+	pkg := ParseReceivePackage(*conn, int(TrackerProtoCmdResp), int64(TrackerQueryStorageStoreBodyLen))
 	if pkg.ErrorNo != 0 {
 		return nil
 	}
 
-	ipAddress := strings.TrimSpace(string(pkg.Body[common.FdfsGroupNameMaxLen : common.FdfsIpaddrSize-2+common.FdfsGroupNameMaxLen]))
-	port := common.Buff2Uint(pkg.Body, common.FdfsGroupNameMaxLen+common.FdfsIpaddrSize-1)
-	storePath := pkg.Body[common.TrackerQueryStorageStoreBodyLen-1]
+	ipAddress := strings.TrimSpace(string(pkg.Body[FdfsGroupNameMaxLen : FdfsIpaddrSize-2+FdfsGroupNameMaxLen]))
+	port := Buff2Uint(pkg.Body, FdfsGroupNameMaxLen+FdfsIpaddrSize-1)
+	storePath := pkg.Body[TrackerQueryStorageStoreBodyLen-1]
 
 	var buf bytes.Buffer
 	buf.WriteString(ipAddress)
@@ -117,60 +116,60 @@ func (tc *TrackerClient) GetStorageServers(trackerServer *TrackerServer, groupNa
 	var length int
 
 	if strings.Compare(strings.TrimSpace(groupName), "") == 0 || len(strings.TrimSpace(groupName)) == 0 {
-		cmd = common.TrackerProtoCmdServiceQueryStoreWithoutGroupAll
+		cmd = TrackerProtoCmdServiceQueryStoreWithoutGroupAll
 		length = 0
 	} else {
-		cmd = common.TrackerProtoCmdServiceQueryStoreWithGroupAll
-		length = common.FdfsGroupNameMaxLen
+		cmd = TrackerProtoCmdServiceQueryStoreWithGroupAll
+		length = FdfsGroupNameMaxLen
 	}
 
-	header := common.PackHeader(cmd, int64(length), 0)
+	header := PackHeader(cmd, int64(length), 0)
 	conn.Write(header)
 
 	//has group name
 	if strings.Compare(strings.TrimSpace(groupName), "") != 0 && len(strings.TrimSpace(groupName)) > 0 {
 		bs := []byte(groupName)
-		groupNameByte := make([]byte, common.FdfsGroupNameMaxLen)
+		groupNameByte := make([]byte, FdfsGroupNameMaxLen)
 		copy(groupNameByte, bs)
 		conn.Write(groupNameByte)
 	}
 
-	pkg := common.ParseReceivePackage(*conn, int(common.TrackerProtoCmdResp), -1)
+	pkg := ParseReceivePackage(*conn, int(TrackerProtoCmdResp), -1)
 	tc.errNo = pkg.ErrorNo
 	if pkg.ErrorNo != 0 {
 		return nil
 	}
 
-	if len(pkg.Body) < common.TrackerQueryStorageStoreBodyLen {
-		tc.errNo = common.ErrNoEinval
+	if len(pkg.Body) < TrackerQueryStorageStoreBodyLen {
+		tc.errNo = ErrNoEinval
 		return nil
 	}
 
-	ipPortLen := len(pkg.Body) - common.FdfsGroupNameMaxLen - 1
-	recordLen := common.FdfsIpaddrSize - 1 + common.FdfsProtoPkgLenSize
+	ipPortLen := len(pkg.Body) - FdfsGroupNameMaxLen - 1
+	recordLen := FdfsIpaddrSize - 1 + FdfsProtoPkgLenSize
 
 	if ipPortLen%recordLen != 0 {
-		tc.errNo = common.ErrNoEinval
+		tc.errNo = ErrNoEinval
 		return nil;
 	}
 
 	serverCount := ipPortLen / recordLen
 	if serverCount > 16 {
-		tc.errNo = common.ErrNoEnospc
+		tc.errNo = ErrNoEnospc
 		return nil;
 	}
 
 	result := make([]*StorageServer, serverCount)
 
 	storePath := pkg.Body[len(pkg.Body)-1];
-	offset := common.FdfsGroupNameMaxLen
+	offset := FdfsGroupNameMaxLen
 
 	for i := 0; i < serverCount; i++ {
-		ipAddress := strings.TrimSpace(string(pkg.Body[offset : common.FdfsIpaddrSize-2+offset]))
-		offset += common.FdfsIpaddrSize - 1
+		ipAddress := strings.TrimSpace(string(pkg.Body[offset : FdfsIpaddrSize-2+offset]))
+		offset += FdfsIpaddrSize - 1
 
-		port := common.Buff2Uint(pkg.Body, offset);
-		offset += common.FdfsProtoPkgLenSize
+		port := Buff2Uint(pkg.Body, offset);
+		offset += FdfsProtoPkgLenSize
 
 		var buf bytes.Buffer
 		buf.WriteString(ipAddress)
@@ -193,10 +192,10 @@ func (tc *TrackerClient) getStorages(trackerServer *TrackerServer, cmd byte, gro
 	conn := trackerServer.conn
 	defer conn.Close()
 	bs := []byte(groupName)
-	groupNameByte := make([]byte, common.FdfsGroupNameMaxLen)
+	groupNameByte := make([]byte, FdfsGroupNameMaxLen)
 	filenameByte := []byte(filename)
 	copy(groupNameByte, bs)
-	header := common.PackHeader(cmd, int64(common.FdfsGroupNameMaxLen+len(filenameByte)), 0)
+	header := PackHeader(cmd, int64(FdfsGroupNameMaxLen+len(filenameByte)), 0)
 	wholePkg := make([]byte, len(header)+len(groupNameByte), len(filenameByte))
 	var buffer bytes.Buffer
 	buffer.Write(header)
@@ -205,42 +204,42 @@ func (tc *TrackerClient) getStorages(trackerServer *TrackerServer, cmd byte, gro
 	copy(wholePkg, buffer.Bytes())
 	conn.Write(wholePkg)
 
-	pkgInfo := common.ParseReceivePackage(*conn, int(common.TrackerProtoCmdResp), -1)
+	pkgInfo := ParseReceivePackage(*conn, int(TrackerProtoCmdResp), -1)
 	tc.errNo = pkgInfo.ErrorNo
 	if pkgInfo.ErrorNo != 0 {
 		return nil
 	}
 
-	if len(pkgInfo.Body) < common.TrackerQueryStorageFetchBodyLen {
+	if len(pkgInfo.Body) < TrackerQueryStorageFetchBodyLen {
 		fmt.Fprintf(os.Stderr, "Invalid body legth: %d", len(pkgInfo.Body))
 		return nil
 	}
 
-	if (len(pkgInfo.Body)-common.TrackerQueryStorageFetchBodyLen)%(common.FdfsIpaddrSize-1) != 0 {
+	if (len(pkgInfo.Body)-TrackerQueryStorageFetchBodyLen)%(FdfsIpaddrSize-1) != 0 {
 		fmt.Fprintf(os.Stderr, "Invalid body length: %d", len(pkgInfo.Body))
 	}
 
-	serverCount := 1 + (len(pkgInfo.Body)-common.TrackerQueryStorageFetchBodyLen)/(common.FdfsIpaddrSize-1)
-	ipAddr := strings.TrimSpace(string(pkgInfo.Body[common.FdfsGroupNameMaxLen:(common.FdfsGroupNameMaxLen + common.FdfsIpaddrSize - 1)]))
-	offset := common.FdfsGroupNameMaxLen + common.FdfsIpaddrSize - 1
+	serverCount := 1 + (len(pkgInfo.Body)-TrackerQueryStorageFetchBodyLen)/(FdfsIpaddrSize-1)
+	ipAddr := strings.TrimSpace(string(pkgInfo.Body[FdfsGroupNameMaxLen:(FdfsGroupNameMaxLen + FdfsIpaddrSize - 1)]))
+	offset := FdfsGroupNameMaxLen + FdfsIpaddrSize - 1
 
-	port := common.Buff2Uint(pkgInfo.Body, offset)
-	offset += common.FdfsProtoPkgLenSize
+	port := Buff2Uint(pkgInfo.Body, offset)
+	offset += FdfsProtoPkgLenSize
 
 	servers := make([]*ServerInfo, serverCount)
 	servers[0] = NewServerInfo(fmt.Sprintf("%s:%d", ipAddr, int(port)))
 
 	for i := 1; i < serverCount; i++ {
-		ipAddr = strings.TrimSpace(string(pkgInfo.Body[offset:(offset + common.FdfsIpaddrSize - 1)]))
+		ipAddr = strings.TrimSpace(string(pkgInfo.Body[offset:(offset + FdfsIpaddrSize - 1)]))
 		servers[i] = NewServerInfo(fmt.Sprintf("%s:%d", ipAddr, int(port)))
-		offset += common.FdfsIpaddrSize - 1
+		offset += FdfsIpaddrSize - 1
 	}
 	return servers
 }
 
 //query storage server to download file
 func (tc *TrackerClient) GetFetchStorage(trackerServer *TrackerServer, groupName string, fileName string) *StorageServer {
-	servers := tc.getStorages(trackerServer, common.TrackerProtoCmdServiceQueryFetchOne, groupName, fileName)
+	servers := tc.getStorages(trackerServer, TrackerProtoCmdServiceQueryFetchOne, groupName, fileName)
 	if servers == nil {
 		return nil
 	} else {
@@ -250,5 +249,5 @@ func (tc *TrackerClient) GetFetchStorage(trackerServer *TrackerServer, groupName
 
 
 func (tc *TrackerClient) GetFetchStorages(trackerServer *TrackerServer, groupName string, filename string) []*ServerInfo {
-	return tc.getStorages(trackerServer, common.TrackerProtoCmdServiceQueryFetchAll, groupName, filename)
+	return tc.getStorages(trackerServer, TrackerProtoCmdServiceQueryFetchAll, groupName, filename)
 }

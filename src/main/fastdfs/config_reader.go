@@ -1,4 +1,4 @@
-package common
+package fastdfs
 
 import (
 	"github.com/akkuman/parseConfig"

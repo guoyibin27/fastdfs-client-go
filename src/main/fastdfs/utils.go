@@ -1,11 +1,11 @@
-package common
+package fastdfs
 
 import (
-	"fmt"
-	"os"
-	"net"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
+	"net"
+	"os"
 )
 
 type Header struct {
