@@ -15,8 +15,8 @@ type TrackerClient struct {
 }
 
 /**
-   * constructor
-   */
+ * constructor
+ */
 func NewTrackerClient() *TrackerClient {
 	trackerClient := new(TrackerClient)
 	trackerClient.trackerGroup = GetConfig().trackGroup
@@ -24,8 +24,8 @@ func NewTrackerClient() *TrackerClient {
 }
 
 /**
-   * constructor with specified tracker group
-   */
+ * constructor with specified tracker group
+ */
 func NewTrackerClientWithSpecifiedGroup(trackerGroup TrackerGroup) *TrackerClient {
 	trackerClient := new(TrackerClient)
 	trackerClient.trackerGroup = &trackerGroup
@@ -39,10 +39,10 @@ func (tc *TrackerClient) GetConnection() *TrackerServer {
 }
 
 /**
-   * get the error code of last call
-   *
-   * @return the error code of last call
-   */
+ * get the error code of last call
+ *
+ * @return the error code of last call
+ */
 func (tc *TrackerClient) GetLastCallErrorNo() int {
 	return tc.lastCallErrorNo
 }
@@ -246,7 +246,6 @@ func (tc *TrackerClient) GetFetchStorage(trackerServer *TrackerServer, groupName
 		return NewStorageServer(servers[0].ipAddr, 0)
 	}
 }
-
 
 func (tc *TrackerClient) GetFetchStorages(trackerServer *TrackerServer, groupName string, filename string) []*ServerInfo {
 	return tc.getStorages(trackerServer, TrackerProtoCmdServiceQueryFetchAll, groupName, filename)

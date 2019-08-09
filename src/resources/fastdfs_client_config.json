@@ -6,6 +6,6 @@
   "http.anti_steal_token": false,
   "http.secret_key": "FastDFS1234567890",
   "tracker_server": [
-    "192.168.10.231:22122"
+    "47.105.83.111:22122"
   ]
 }
